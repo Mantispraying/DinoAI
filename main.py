@@ -205,7 +205,7 @@ def eval_genomes(genomes, config):
             obstacle.update()
             for i, dinosaur in enumerate(dinosaurs):
                 if dinosaur.rect.colliderect(obstacle.rect):
-                    ge[i].fitness -= 1
+                    ge[i].fitness += points
                     remove(i)
 
         for i, dinosaur in enumerate(dinosaurs):
