@@ -163,8 +163,8 @@ def eval_genomes(genomes, config):
             f'Game Speed: {str(game_speed)}', True, (0, 0, 0))
 
         SCREEN.blit(text_1, (50, 450))
-        SCREEN.blit(text_1, (50, 480))
-        SCREEN.blit(text_1, (50, 510))
+        SCREEN.blit(text_2, (50, 480))
+        SCREEN.blit(text_3, (50, 510))
 
     def background():
         global x_pos_bg, y_pos_bg
