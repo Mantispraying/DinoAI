@@ -79,6 +79,9 @@ class Dinosaur:
         SCREEN.blit(self.image, (self.rect.x, self.rect.y))
         pygame.draw.rect(SCREEN, self.color, (self.rect.x,
                          self.rect.y, self.rect.width, self.rect.height), 2)
+        for obstacle in obstacles:
+            pygame.draw.line(SCREEN, self.color, (self.rect.x+54,
+                             self.rect.y+12), obstacle.rect.center, 2)
 
 
 class Obstacles:
@@ -150,6 +153,19 @@ def eval_genomes(genomes, config):
         text = FONT.render(f'Points: {str(points)}', True, (0, 0, 0))
         SCREEN.blit(text, (950, 50))
 
+    def statistics():
+        global dinosaurs, game_speed, ge
+        text_1 = FONT.render(
+            f'Dinosaurs Alive: {str(len(dinosaurs))}', True, (0, 0, 0))
+        text_2 = FONT.render(
+            f'Generation: {pop.generation+1}', True, (0, 0, 0))
+        text_3 = FONT.render(
+            f'Game Speed: {str(game_speed)}', True, (0, 0, 0))
+
+        SCREEN.blit(text_1, (50, 450))
+        SCREEN.blit(text_1, (50, 480))
+        SCREEN.blit(text_1, (50, 510))
+
     def background():
         global x_pos_bg, y_pos_bg
         image_width = BG.get_width()
@@ -199,6 +215,7 @@ def eval_genomes(genomes, config):
                 dinosaur.dino_jump = True
                 dinosaur.dino_run = False
 
+        statistics()
         score()
         background()
         clock.tick(30)
@@ -208,6 +225,7 @@ def eval_genomes(genomes, config):
 
 
 def run(config_path):
+    global pop
     config = neat.config.Config(
         neat.DefaultGenome,
         neat.DefaultReproduction,
