@@ -1,3 +1,4 @@
+from cgitb import text
 from sre_constants import JUMP
 import pygame
 import os
@@ -60,9 +61,32 @@ class Dinosaur:
         SCREEN.blit(self.image, (self.rect.x, self.rect.y))
 
 def main():
+    global game_speed, x_pos_bg, y_pos_bg, points
     clock = pygame.time.Clock()
+    points = 0
 
     dinosaurs = [Dinosaur()]
+
+    x_pos_bg = 0
+    y_pos_bg = 380
+    game_speed = 20
+
+    def score():
+        global points, game_speed
+        points += 1
+        if points % 100 == 0:
+            game_speed += 1
+        text = FONT.render(f'Points: {str(points)}', True, (0, 0, 0))
+        SCREEN.blit(text, (950, 50))
+
+    def background():
+        global x_pos_bg, y_pos_bg
+        image_width = BG.get_width()
+        SCREEN.blit(BG, (x_pos_bg, y_pos_bg))
+        SCREEN.blit(BG, (image_width + x_pos_bg, y_pos_bg))
+        if x_pos_bg <= -image_width:
+            x_pos_bg = 0
+        x_pos_bg -= game_speed
 
     run = True
     while run:
@@ -84,6 +108,8 @@ def main():
                 dinosaur.dino_jump = True
                 dinosaur.dino_run = False
 
+        score()
+        background()
         clock.tick(30)
         pygame.display.update()
 
