@@ -27,6 +27,8 @@ LARGE_CACTUS = [pygame.image.load(os.path.join("Assets/Cactus", "LargeCactus1.pn
                     "Assets/Cactus", "LargeCactus2.png")),
                 pygame.image.load(os.path.join("Assets/Cactus", "LargeCactus3.png"))]
 
+CLOUD = pygame.image.load(os.path.join("Assets/Other", "Cloud.png"))
+
 BG = pygame.image.load(os.path.join("Assets/Other", "Track.png"))
 
 FONT = pygame.font.Font('freesansbold.ttf', 20)
@@ -84,6 +86,23 @@ class Dinosaur:
                              self.rect.y+12), obstacle.rect.center, 2)
 
 
+class Cloud:
+    def __init__(self):
+        self.x = SCREEN_WIDTH + random.randint(800, 1000)
+        self.y = random.randint(50, 100)
+        self.image = CLOUD
+        self.width = self.image.get_width()
+
+    def update(self):
+        self.x -= game_speed
+        if self.x < -self.width:
+            self.x = SCREEN_WIDTH + random.randint(2500, 3000)
+            self.y = random.randint(50, 100)
+
+    def draw(self, SCREEN):
+        SCREEN.blit(self.image, (self.x, self.y))
+
+
 class Obstacles:
     def __init__(self, image, number_of_cacti):
         self.image = image
@@ -129,6 +148,7 @@ def eval_genomes(genomes, config):
     clock = pygame.time.Clock()
     points = 0
 
+    cloud = Cloud()
     obstacles = []
     dinosaurs = []
     ge = []
@@ -217,12 +237,14 @@ def eval_genomes(genomes, config):
 
         statistics()
         score()
+        cloud.draw(SCREEN)
+        cloud.update()
         background()
         clock.tick(30)
         pygame.display.update()
 
-# NEAT
 
+# NEAT
 
 def run(config_path):
     global pop
