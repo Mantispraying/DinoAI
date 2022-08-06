@@ -271,7 +271,7 @@ def eval_genomes(genomes, config):
 
         for i, dinosaur in enumerate(dinosaurs):
             output = nets[i].activate(
-                (dinosaur.rect.x, obstacle.rect.y, obstacle.rect.width, obstacle.rect.height, distance((dinosaur.rect.x, dinosaur.rect.y), obstacle.rect.midtop), game_speed))
+                (dinosaur.rect.y, obstacle.rect.y, obstacle.rect.width, obstacle.rect.height, distance((dinosaur.rect.x, dinosaur.rect.y), obstacle.rect.midtop), game_speed))
             if output[0] > 0 and not dinosaur.dino_jump and not dinosaur.dino_duck:
                 dinosaur.dino_duck = True
                 dinosaur.dino_run = False
