@@ -27,6 +27,9 @@ LARGE_CACTUS = [pygame.image.load(os.path.join("Assets/Cactus", "LargeCactus1.pn
                     "Assets/Cactus", "LargeCactus2.png")),
                 pygame.image.load(os.path.join("Assets/Cactus", "LargeCactus3.png"))]
 
+BIRD = [pygame.image.load(os.path.join("Assets/Bird", "Bird1.png")),
+        pygame.image.load(os.path.join("Assets/Bird", "Bird2.png"))]
+
 CLOUD = pygame.image.load(os.path.join("Assets/Other", "Cloud.png"))
 
 BG = pygame.image.load(os.path.join("Assets/Other", "Track.png"))
@@ -103,10 +106,10 @@ class Cloud:
         SCREEN.blit(self.image, (self.x, self.y))
 
 
-class Obstacles:
-    def __init__(self, image, number_of_cacti):
+class Obstacle:
+    def __init__(self, image, type):
         self.image = image
-        self.type = number_of_cacti
+        self.type = type
         self.rect = self.image[self.type].get_rect()
         self.rect.x = SCREEN_WIDTH
 
@@ -119,16 +122,32 @@ class Obstacles:
         SCREEN.blit(self.image[self.type], self.rect)
 
 
-class SmallCactus(Obstacles):
-    def __init__(self, image, number_of_cacti):
-        super().__init__(image, number_of_cacti)
+class SmallCactus(Obstacle):
+    def __init__(self, image):
+        self.type = random.randint(0, 2)
+        super().__init__(image, self.type)
         self.rect.y = 325
 
 
-class LargeCactus(Obstacles):
-    def __init__(self, image, number_of_cacti):
-        super().__init__(image, number_of_cacti)
+class LargeCactus(Obstacle):
+    def __init__(self, image):
+        self.type = random.randint(0, 2)
+        super().__init__(image, self.type)
         self.rect.y = 300
+
+
+class Bird(Obstacle):
+    def __init__(self, image):
+        self.type = 0
+        super().__init__(image, self.type)
+        self.rect.y = 250
+        self.index = 0
+
+    def draw(self, SCREEN):
+        if self.index >= 9:
+            self.index = 0
+        SCREEN.blit(self.image[self.index//5], self.rect)
+        self.index += 1
 
 
 def remove(index):
@@ -215,10 +234,12 @@ def eval_genomes(genomes, config):
             rand_int = random.randint(0, 1)
             if rand_int == 0:
                 obstacles.append(SmallCactus(
-                    SMALL_CACTUS, random.randint(0, 2)))
+                    SMALL_CACTUS))
             elif rand_int == 1:
                 obstacles.append(LargeCactus(
-                    LARGE_CACTUS, random.randint(0, 2)))
+                    LARGE_CACTUS))
+            elif rand_int == 2:
+                obstacles.append(Bird(BIRD))
 
         for obstacle in obstacles:
             obstacle.draw(SCREEN)
