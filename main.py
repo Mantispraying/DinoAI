@@ -17,6 +17,9 @@ RUNNING = [pygame.image.load(os.path.join("Assets/Dino", "DinoRun1.png")),
 
 JUMPING = pygame.image.load(os.path.join("Assets/Dino", "DinoJump.png"))
 
+DUCKING = [pygame.image.load(os.path.join("Assets/Dino", "DinoDuck1.png")),
+           pygame.image.load(os.path.join("Assets/Dino", "DinoDuck2.png"))]
+
 SMALL_CACTUS = [pygame.image.load(os.path.join("Assets/Cactus", "SmallCactus1.png")),
                 pygame.image.load(os.path.join(
                     "Assets/Cactus", "SmallCactus2.png")),
@@ -40,23 +43,32 @@ FONT = pygame.font.Font('freesansbold.ttf', 20)
 class Dinosaur:
     X_POS = 80
     Y_POS = 310
+    Y_POS_DUCK = 340
     JUMP_VEL = 8.5
 
-    def __init__(self, img=RUNNING[0]):
-        self.image = img
+    def __init__(self):
+        self.duck_img = DUCKING
+        self.run_img = RUNNING
+        self.jump_img = JUMPING
+        self.image = self.run_img[0]
+
+        self.dino_duck = False
         self.dino_run = True
         self.dino_jump = False
+
+        self.rect = self.image.get_rect()
+        self.rect.x = self.X_POS
+        self.rect.y = self.Y_POS
+
         self.jump_vel = self.JUMP_VEL
-        self.rect = pygame.Rect(self.X_POS,
-                                self.Y_POS,
-                                img.get_width(),
-                                img.get_height())
         self.color = (random.randint(0, 255),
                       random.randint(0, 255),
                       random.randint(0, 255))
         self.step_index = 0
 
     def update(self):
+        if self.dino_duck:
+            self.duck()
         if self.dino_run:
             self.run()
         if self.dino_jump:
@@ -64,8 +76,15 @@ class Dinosaur:
         if self.step_index >= 10:
             self.step_index = 0
 
+    def duck(self):
+        self.image = self.duck_img[self.step_index // 5]
+        self.rect = self.image.get_rect()
+        self.rect.x = self.X_POS
+        self.rect.y = self.Y_POS_DUCK
+        self.step_index += 1
+
     def jump(self):
-        self.image = JUMPING
+        self.image = self.jump_img
         if self.dino_jump:
             self.rect.y -= self.jump_vel * 4
             self.jump_vel -= 0.8
@@ -75,7 +94,8 @@ class Dinosaur:
             self.jump_vel = self.JUMP_VEL
 
     def run(self):
-        self.image = RUNNING[self.step_index // 5]
+        self.image = self.run_img[self.step_index // 5]
+        self.rect = self.image.get_rect()
         self.rect.x = self.X_POS
         self.rect.y = self.Y_POS
         self.step_index += 1
@@ -140,7 +160,7 @@ class Bird(Obstacle):
     def __init__(self, image):
         self.type = 0
         super().__init__(image, self.type)
-        self.rect.y = 250
+        self.rect.y = random.randint(200,250)
         self.index = 0
 
     def draw(self, SCREEN):
@@ -231,7 +251,7 @@ def eval_genomes(genomes, config):
             break
 
         if len(obstacles) == 0:
-            rand_int = random.randint(0, 1)
+            rand_int = random.randint(0, 2)
             if rand_int == 0:
                 obstacles.append(SmallCactus(
                     SMALL_CACTUS))
@@ -251,8 +271,14 @@ def eval_genomes(genomes, config):
 
         for i, dinosaur in enumerate(dinosaurs):
             output = nets[i].activate(
-                (dinosaur.rect.x, distance((dinosaur.rect.x, dinosaur.rect.y), obstacle.rect.midtop)))
-            if output[0] > 0.5 and dinosaur.rect.y == dinosaur.Y_POS:
+                (dinosaur.rect.x, obstacle.rect.y, obstacle.rect.width, obstacle.rect.height, distance((dinosaur.rect.x, dinosaur.rect.y), obstacle.rect.midtop), game_speed))
+            if output[0] > 0 and not dinosaur.dino_jump and not dinosaur.dino_duck:
+                dinosaur.dino_duck = True
+                dinosaur.dino_run = False
+            elif output[0] <= 0.5 and not dinosaur.dino_jump and dinosaur.dino_duck:
+                dinosaur.dino_duck = False
+                dinosaur.dino_run = True
+            elif output[1] > 0.5 and dinosaur.rect.y == dinosaur.Y_POS:
                 dinosaur.dino_jump = True
                 dinosaur.dino_run = False
 
