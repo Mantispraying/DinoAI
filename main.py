@@ -1,3 +1,4 @@
+from sre_constants import JUMP
 import pygame
 import os
 import random
@@ -160,7 +161,7 @@ class Bird(Obstacle):
     def __init__(self, image):
         self.type = 0
         super().__init__(image, self.type)
-        self.rect.y = random.randint(200,250)
+        self.rect.y = random.randint(200, 250)
         self.index = 0
 
     def draw(self, SCREEN):
@@ -308,6 +309,9 @@ def run(config_path):
 
 
 if __name__ == "__main__":
+    pygame.display.set_caption('DinoAI')
+    ICON = pygame.image.load(os.path.join("Assets/Dino", "DinoJump.png"))
+    pygame.display.set_icon(ICON)
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, 'config.txt')
     run(config_path)
